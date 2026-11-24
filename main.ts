@@ -3,7 +3,9 @@ import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 const I = process.env.MAKEFUN_INPUT_DIR ?? '/input';
 const O = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
-// opcode -> [immediate bytes, pops, pushes]
+// opcode -> [immediate bytes, pops, pushes]. Pops/pushes are checked before the op runs: too few operands
+// exits 2, a stack that would pass 256 exits 3. Other exits: 4 div by zero, 5 bad opcode, 6 bad address,
+// 7 call overflow, 8 return underflow, 9 pc out of range, 10 step limit, 11 output limit.
 const SPEC: Record<number, number[]> = {
   0x00: [0, 0, 0], 0x01: [1, 0, 1], 0x02: [4, 0, 1], 0x03: [0, 1, 0], 0x04: [0, 1, 2], 0x05: [0, 2, 2],
   0x06: [0, 2, 3], 0x07: [0, 3, 3], 0x17: [0, 1, 1], 0x1b: [0, 1, 1], 0x30: [2, 0, 0], 0x31: [2, 1, 0],
